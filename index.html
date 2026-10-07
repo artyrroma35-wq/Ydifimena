@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="ru" data-sky="aurora">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#080a12" />
+    <meta name="description" content="Тихая орбита — личное пространство для фокуса, маленьких шагов и передышки." />
+    <title>Тише — пространство для важного</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="./app.js" defer></script>
+  </head>
+  <body>
+    <canvas id="starfield" aria-hidden="true"></canvas>
+
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#top" aria-label="Тише — на главную">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 44 44" fill="none">
+              <circle cx="22" cy="22" r="7.5" fill="currentColor" />
+              <ellipse cx="22" cy="22" rx="18" ry="8" stroke="currentColor" stroke-width="1.2" transform="rotate(-35 22 22)" />
+              <circle cx="35.8" cy="11.8" r="2.3" fill="var(--bg-base)" stroke="currentColor" stroke-width="1.3" />
+              <circle cx="11.2" cy="31.4" r="1.4" fill="currentColor" />
+            </svg>
+          </span>
+          <span class="brand-copy">
+            <span class="brand-name">тише<span class="brand-period">.</span></span>
+            <span class="brand-subtitle">ЛИЧНАЯ ОРБИТА</span>
+          </span>
+        </a>
+
+        <div class="topbar-center" aria-label="Статус приложения">
+          <span class="status-dot"></span>
+          <span>ПРОСТРАНСТВО ОТКРЫТО</span>
+        </div>
+
+        <div class="topbar-actions">
+          <button class="toolbar-button sky-button" id="skyButton" type="button" title="Сменить цвет неба" aria-label="Сменить цвет неба">
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 2.1v2M10 15.9v2M2.1 10h2m11.8 0h2M4.42 4.42l1.42 1.42m8.32 8.32 1.42 1.42m0-11.16-1.42 1.42m-8.32 8.32-1.42 1.42" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><circle cx="10" cy="10" r="3.4" stroke="currentColor" stroke-width="1.2"/></svg>
+            <span id="skyLabel">Аврора</span>
+          </button>
+          <button class="toolbar-button sound-button" id="soundButton" type="button" aria-pressed="false" title="Включить мягкий шум">
+            <svg class="sound-icon sound-off-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3 8v4h3l4 3V5L6 8H3Z" stroke="currentColor" stroke-width="1.25" stroke-linejoin="round"/><path d="m14 8 4 4m0-4-4 4" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>
+            <svg class="sound-icon sound-on-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3 8v4h3l4 3V5L6 8H3Z" stroke="currentColor" stroke-width="1.25" stroke-linejoin="round"/><path d="M13 7.4a4 4 0 0 1 0 5.2m2-7.2a7 7 0 0 1 0 9.2" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>
+            <span id="soundLabel">Тихий фон</span>
+          </button>
+        </div>
+      </header>
+
+      <main id="top">
+        <section class="hero" aria-labelledby="pageTitle">
+          <div class="hero-copy">
+            <p class="eyebrow hero-date"><span class="eyebrow-line"></span><span id="todayDate">СЕГОДНЯ</span></p>
+            <h1 id="pageTitle">Не весь путь.<br /><em>Только следующая точка.</em></h1>
+            <p class="hero-description">День складывается из маленьких вещей,<br class="desktop-break" /> которым ты сказал «да».</p>
+          </div>
+
+          <aside class="daily-card" aria-label="Прогресс за сегодня">
+            <div class="daily-card-top">
+              <span class="eyebrow">ТВОЙ МАЛЕНЬКИЙ ПЛАН</span>
+              <span class="daily-spark" aria-hidden="true">✳</span>
+            </div>
+            <div class="daily-count"><strong id="heroDone">0</strong><span class="daily-slash">/</span><span id="heroTotal">3</span><span class="daily-count-label">точки</span></div>
+            <div class="daily-progress-track" role="progressbar" aria-label="Выполнено намерений" aria-valuemin="0" aria-valuemax="3" aria-valuenow="0">
+              <span id="heroProgressBar"></span>
+            </div>
+            <p id="heroProgressHint">Можно начать с любой.</p>
+          </aside>
+        </section>
+
+        <section class="dashboard" aria-label="Твоя тихая орбита">
+          <article class="panel map-panel" aria-labelledby="mapTitle">
+            <div class="panel-heading map-heading">
+              <div>
+                <p class="eyebrow"><span class="tiny-star">✦</span> КАРТА ДНЯ</p>
+                <h2 id="mapTitle">Твои точки<span class="heading-period">.</span></h2>
+              </div>
+              <div class="map-counter" aria-label="Количество намерений">
+                <span class="map-counter-number" id="mapTaskCount">03</span>
+                <span class="map-counter-label">НАМЕРЕНИЯ</span>
+              </div>
+            </div>
+
+            <div class="constellation-wrap">
+              <svg class="constellation" id="constellation" viewBox="0 0 700 250" role="group" aria-label="Карта намерений. Выбери звезду, чтобы установить фокус.">
+                <defs>
+                  <radialGradient id="chartGlow">
+                    <stop offset="0" stop-color="var(--accent)" stop-opacity=".20" />
+                    <stop offset="1" stop-color="var(--accent)" stop-opacity="0" />
+                  </radialGradient>
+                  <linearGradient id="trailGradient" x1="0" x2="1" y1="0" y2="1">
+                    <stop offset="0" stop-color="var(--accent)" stop-opacity=".12" />
+                    <stop offset=".53" stop-color="var(--accent)" stop-opacity=".66" />
+                    <stop offset="1" stop-color="var(--accent-2)" stop-opacity=".2" />
+                  </linearGradient>
+                  <filter id="starBlur" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="7" /></filter>
+                </defs>
+                <ellipse class="chart-orbit orbit-one" cx="350" cy="128" rx="296" ry="82" />
+                <ellipse class="chart-orbit orbit-two" cx="350" cy="128" rx="218" ry="115" />
+                <circle cx="350" cy="128" r="92" fill="url(#chartGlow)" />
+                <g class="chart-distant-stars" aria-hidden="true">
+                  <circle cx="69" cy="135" r="1.2"/><circle cx="254" cy="222" r="1"/><circle cx="616" cy="46" r="1.1"/>
+                  <circle cx="430" cy="36" r="1.1"/><circle cx="594" cy="203" r="1.2"/><circle cx="128" cy="53" r=".9"/>
+                  <circle cx="350" cy="210" r=".9"/><circle cx="543" cy="89" r=".9"/><circle cx="189" cy="194" r="1"/>
+                </g>
+                <path class="constellation-trail" id="constellationTrail" d="" />
+                <g id="constellationNodes"></g>
+                <g class="chart-center" aria-hidden="true">
+                  <circle cx="350" cy="128" r="2" />
+                </g>
+              </svg>
+              <div class="chart-label chart-label-left" aria-hidden="true">ТВОЙ ТЕМП</div>
+              <div class="chart-label chart-label-right" aria-hidden="true">ТВОЙ МАРШРУТ</div>
+            </div>
+
+            <div class="task-section-heading">
+              <div>
+                <p class="eyebrow">НАМЕРЕНИЯ</p>
+                <p class="task-section-note">Выбери звезду — или добавь новую.</p>
+              </div>
+              <span class="task-shortcut"><kbd>N</kbd> новая точка</span>
+            </div>
+
+            <div class="task-list" id="taskList" aria-live="polite" aria-relevant="additions removals"></div>
+
+            <form class="add-task-form" id="addTaskForm">
+              <label class="sr-only" for="newTaskInput">Новое намерение</label>
+              <span class="add-task-plus" aria-hidden="true">+</span>
+              <input id="newTaskInput" name="task" type="text" maxlength="72" autocomplete="off" placeholder="Добавить маленький шаг…" />
+              <button type="submit" aria-label="Добавить намерение" title="Добавить намерение">
+                <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h12m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </form>
+            <p class="map-footnote"><span class="footnote-star">✦</span> Это черновик твоего дня. Его можно менять.</p>
+          </article>
+
+          <div class="right-column">
+            <article class="panel focus-panel" aria-labelledby="focusTitle">
+              <div class="focus-header">
+                <div>
+                  <p class="eyebrow"><span class="live-ring"></span> ПРОСТРАНСТВО ФОКУСА</p>
+                  <h2 id="focusTitle">Одна вещь<span class="heading-period">.</span></h2>
+                </div>
+                <span class="focus-mode" id="timerStatus">ГОТОВ К ФОКУСУ</span>
+              </div>
+
+              <div class="timer-visual" id="timerVisual">
+                <div class="timer-aura" aria-hidden="true"></div>
+                <svg class="timer-ring" viewBox="0 0 240 240" aria-hidden="true">
+                  <defs><linearGradient id="timer-gradient" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--accent)"/><stop offset="1" stop-color="var(--accent-2)"/></linearGradient></defs>
+                  <circle class="timer-ring-track" cx="120" cy="120" r="103" />
+                  <circle class="timer-ring-progress" id="timerProgress" cx="120" cy="120" r="103" />
+                  <circle class="timer-ring-orbit" cx="120" cy="120" r="86" />
+                  <circle class="timer-ring-star" id="timerStar" cx="120" cy="17" r="3.5" />
+                </svg>
+                <div class="timer-center">
+                  <span class="timer-overline" id="timerOverline">ОДИН МАЛЕНЬКИЙ ОТРЕЗОК</span>
+                  <time class="timer-time" id="timerTime" datetime="PT25M" aria-live="off">25:00</time>
+                  <span class="timer-under" id="timerSubline">ни одного «надо»</span>
+                </div>
+              </div>
+
+              <div class="duration-picker" role="group" aria-label="Длительность фокус-сессии">
+                <button type="button" data-minutes="15" aria-pressed="false">15 <span>мин</span></button>
+                <button type="button" data-minutes="25" class="is-selected" aria-pressed="true">25 <span>мин</span></button>
+                <button type="button" data-minutes="45" aria-pressed="false">45 <span>мин</span></button>
+                <button type="button" data-minutes="60" aria-pressed="false">60 <span>мин</span></button>
+              </div>
+
+              <div class="focus-task" id="focusTask">
+                <span class="focus-task-marker" aria-hidden="true"></span>
+                <div class="focus-task-copy">
+                  <span class="focus-task-label">СЕЙЧАС В ФОКУСЕ</span>
+                  <span class="focus-task-name" id="focusTaskName">Выбери точку на карте</span>
+                </div>
+                <button class="clear-focus" id="clearFocus" type="button" aria-label="Сбросить выбранное намерение" title="Сбросить фокус" hidden>×</button>
+              </div>
+
+              <div class="timer-controls">
+                <button class="timer-start" id="timerStart" type="button">
+                  <svg class="play-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m7 4.8 9 5.2-9 5.2V4.8Z" fill="currentColor"/></svg>
+                  <svg class="pause-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M6.4 5v10m7.2-10v10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                  <span id="timerStartLabel">Начать фокус</span>
+                  <span class="button-key" aria-hidden="true">SPACE</span>
+                </button>
+                <button class="timer-reset" id="timerReset" type="button" aria-label="Сбросить таймер" title="Сбросить таймер">
+                  <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 8a6.5 6.5 0 1 1-.2 3.7M4 4v4h4" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+              </div>
+
+              <div class="focus-stats" aria-label="Итоги фокус-сессий за сегодня">
+                <div><span class="stat-icon">◷</span><span><strong id="sessionsToday">0</strong><small>сессий</small></span></div>
+                <span class="stats-divider"></span>
+                <div><span class="stat-icon stat-icon-spark">✦</span><span><strong id="focusMinutesToday">0</strong><small>минут в фокусе</small></span></div>
+                <span class="stats-note">только для тебя</span>
+              </div>
+            </article>
+
+            <article class="note-card">
+              <div class="note-icon" aria-hidden="true">
+                <svg viewBox="0 0 34 34" fill="none"><path d="M17 4.5v25M4.5 17h25M8.16 8.16l17.68 17.68m0-17.68L8.16 25.84" stroke="currentColor" stroke-width=".9" opacity=".7"/><circle cx="17" cy="17" r="5" stroke="currentColor" stroke-width="1.1"/><circle cx="17" cy="17" r="1.5" fill="currentColor"/></svg>
+              </div>
+              <div class="note-copy">
+                <span class="eyebrow">ЗАПИСКА СЕБЕ</span>
+                <p id="dailyNote">Незаконченный список — не обещание.</p>
+              </div>
+              <button id="breathButton" class="breath-button" type="button" aria-label="Открыть короткую дыхательную паузу" title="Короткая дыхательная пауза">
+                <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 16.8s-6.8-3.9-6.8-8.5a3.6 3.6 0 0 1 6.8-1.7 3.6 3.6 0 0 1 6.8 1.7c0 4.6-6.8 8.5-6.8 8.5Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M5.4 10h2l1.2-2 2.2 4 1.3-2h2.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </article>
+          </div>
+        </section>
+
+        <footer class="page-footer">
+          <span>СОБРАНО С ЗАБОТОЙ О ТВОЁМ ВНИМАНИИ</span>
+          <span class="footer-center">Никаких аккаунтов. Данные остаются в этом браузере.</span>
+          <span class="footer-shortcut"><kbd>ESC</kbd> закрыть паузу</span>
+        </footer>
+      </main>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <div class="breath-overlay" id="breathOverlay" aria-hidden="true" inert>
+      <div class="breath-dialog" role="dialog" aria-modal="true" aria-labelledby="breathTitle" aria-describedby="breathInstructions">
+        <button class="breath-close" id="breathClose" type="button" aria-label="Закрыть дыхательную паузу">×</button>
+        <p class="eyebrow"><span class="eyebrow-line"></span> 42 СЕКУНДЫ ДЛЯ СЕБЯ</p>
+        <h2 id="breathTitle">Вернись <em>в момент.</em></h2>
+        <p class="breath-intro" id="breathInstructions">Следуй за светом. Здесь не нужно делать ничего правильно.</p>
+        <div class="breath-orbit" id="breathOrbit" data-phase="rest" aria-hidden="true">
+          <span class="breath-orbit-ring"></span>
+          <span class="breath-orb-core"></span>
+          <span class="breath-orb-halo"></span>
+        </div>
+        <div class="breath-phase" id="breathPhase" aria-live="polite">Когда будешь готов</div>
+        <div class="breath-countdown" id="breathCountdown">—</div>
+        <div class="breath-bottom">
+          <span id="breathRound">ТРИ СПОКОЙНЫХ ЦИКЛА</span>
+          <button id="breathStart" type="button">Начать <span aria-hidden="true">→</span></button>
+        </div>
+      </div>
+    </div>
+
+    <noscript><p class="noscript-message">Чтобы пользоваться орбитой, включи JavaScript в браузере.</p></noscript>
+  </body>
+</html>
